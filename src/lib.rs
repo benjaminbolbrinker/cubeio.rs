@@ -165,5 +165,23 @@ mod tests {
     fn write_file() {
         let cube_data = super::read_cube("tdc.cube").unwrap();
         super::write_cube("tdc_out.cube", &cube_data).unwrap();
+        let cube_data_read = super::read_cube("tdc_out.cube").unwrap();
+        assert_eq!(cube_data.n_atoms, cube_data_read.n_atoms);
+        assert_eq!(cube_data.origin, cube_data_read.origin);
+        assert_eq!(cube_data.shape, cube_data_read.shape);
+        assert_eq!(cube_data.atoms[0].an, cube_data_read.atoms[0].an);
+        assert_eq!(
+            cube_data.atoms[cube_data.atoms.len() - 1].an,
+            cube_data_read.atoms[cube_data_read.atoms.len() - 1].an
+        );
+        approx_eq!(
+            f32,
+            cube_data.atoms[0].charge,
+            cube_data_read.atoms[0].charge
+        );
+        assert_eq!(
+            cube_data_read.data.len(),
+            (cube_data_read.shape[0] * cube_data_read.shape[1] * cube_data_read.shape[2]) as usize
+        );
     }
 }
