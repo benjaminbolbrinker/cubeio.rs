@@ -1,5 +1,5 @@
 [package]
-name = "fileio"
+name = "cubeio"
 version = "0.1.0"
 authors = ["Benjamin Bolbrinker <benjamin.bolbrinker@kemi.uu.se>"]
 edition = "2018"

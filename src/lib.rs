@@ -1,37 +1,38 @@
+use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::fs::File;
 
 fn parse_line(line: String) -> Vec<f64> {
     let line = line.split_whitespace();
-    line.map(|x| x.parse::<f64>().unwrap()).collect::<Vec<f64>>()
+    line.map(|x| x.parse::<f64>().unwrap())
+        .collect::<Vec<f64>>()
 }
 
 #[allow(dead_code)]
 pub struct Atom {
     an: u32,
     charge: f32,
-    pos: Vec<f64> 
+    pos: Vec<f64>,
 }
 
 pub struct CubeData {
-    n_atoms: u32,
-    origin: Vec<f64>,
-    shape: Vec<u32>,
-    data: Vec<f64>,
-    cell: Vec<Vec<f64>>,
-    atoms: Vec<Atom>
+    pub n_atoms: u32,
+    pub origin: Vec<f64>,
+    pub shape: Vec<u32>,
+    pub data: Vec<f64>,
+    pub cell: Vec<Vec<f64>>,
+    pub atoms: Vec<Atom>,
 }
 
 impl CubeData {
     fn new() -> Self {
-        CubeData{
+        CubeData {
             n_atoms: 0,
             origin: vec![0f64; 3],
             shape: vec![0u32; 3],
             cell: vec![vec![0f64; 3]; 3],
             atoms: Vec::new(),
-            data: Vec::new()
+            data: Vec::new(),
         }
     }
 }
@@ -40,7 +41,6 @@ pub fn read_cube(file_name: &str) -> std::io::Result<CubeData> {
     let f = File::open(file_name)?;
     let reader = BufReader::new(f);
     let mut cube_data = CubeData::new();
-    println!("{}", cube_data.n_atoms);
 
     let mut lines = reader.lines();
     lines.next();
@@ -66,7 +66,7 @@ pub fn read_cube(file_name: &str) -> std::io::Result<CubeData> {
         cube_data.atoms.push(Atom {
             an: line_atom[0] as u32,
             charge: line_atom[1] as f32,
-            pos: Vec::from(&line_atom[2..])
+            pos: Vec::from(&line_atom[2..]),
         });
         idx += 1;
     }
@@ -76,6 +76,12 @@ pub fn read_cube(file_name: &str) -> std::io::Result<CubeData> {
     }
 
     Ok(cube_data)
+}
+
+pub fn write_cube(file_name: &str, cube_data: &CubeData) -> std::io::Result<()> {
+    let mut file = File::create(file_name)?;
+    file.write_all(b"Hello, world!")?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -90,6 +96,14 @@ mod tests {
         assert_eq!(cube_data.atoms[0].an, 3u32);
         assert_eq!(cube_data.atoms[cube_data.atoms.len() - 1].an, 16u32);
         approx_eq!(f32, cube_data.atoms[0].charge, 0f32);
-        assert_eq!(cube_data.data.len(), (cube_data.shape[0]*cube_data.shape[1]*cube_data.shape[2]) as usize);
+        assert_eq!(
+            cube_data.data.len(),
+            (cube_data.shape[0] * cube_data.shape[1] * cube_data.shape[2]) as usize
+        );
+        assert!(false);
+    }
+    fn write_file() {
+        let cube_data = super::read_cube("tdc.cube").unwrap();
+        super::write_cube("tdc_out.cube", &cube_data).unwrap();
     }
 }
