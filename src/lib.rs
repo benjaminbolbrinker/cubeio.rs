@@ -54,11 +54,20 @@ pub fn read_cube(file_name: &str) -> std::io::Result<CubeData> {
     let line6 = parse_line(lines.next().unwrap()?);
 
     cube_data.shape[0] = line4[0] as u32;
-    cube_data.cell[0] = Vec::from(&line4[1..]);
+    cube_data.cell[0] = Vec::from(&line4[1..])
+        .iter()
+        .map(|x| x * cube_data.shape[0] as f64)
+        .collect();
     cube_data.shape[1] = line5[0] as u32;
-    cube_data.cell[1] = Vec::from(&line5[1..]);
+    cube_data.cell[1] = Vec::from(&line5[1..])
+        .iter()
+        .map(|x| x * cube_data.shape[1] as f64)
+        .collect();
     cube_data.shape[2] = line6[0] as u32;
-    cube_data.cell[2] = Vec::from(&line6[1..]);
+    cube_data.cell[2] = Vec::from(&line6[1..])
+        .iter()
+        .map(|x| x * cube_data.shape[2] as f64)
+        .collect();
 
     let mut idx = 0;
     while idx < cube_data.n_atoms {
@@ -108,7 +117,7 @@ pub fn write_cube(file_name: &str, cube_data: &CubeData) -> std::io::Result<()> 
             cube_data.cell[i]
                 .iter()
                 .map(|x| {
-                    let mut x = x.to_string();
+                    let mut x = (x / cube_data.shape[i] as f64).to_string();
                     x.push_str(delimiter);
                     return x;
                 })
@@ -153,9 +162,22 @@ mod tests {
         assert_eq!(cube_data.n_atoms, 30);
         assert_eq!(cube_data.origin, vec![0f64; 3]);
         assert_eq!(cube_data.shape, vec![79u32, 52u32, 85u32]);
+
+        assert!(approx_eq!(f64, cube_data.cell[0][0], 14.831539));
+        assert!(approx_eq!(f64, cube_data.cell[0][1], 0.0));
+        assert!(approx_eq!(f64, cube_data.cell[0][2], 0.0));
+
+        assert!(approx_eq!(f64, cube_data.cell[1][0], 0.0));
+        assert!(approx_eq!(f64, cube_data.cell[1][1], 9.67538));
+        assert!(approx_eq!(f64, cube_data.cell[1][2], 0.0));
+
+        assert!(approx_eq!(f64, cube_data.cell[2][0], -1.263185));
+        assert!(approx_eq!(f64, cube_data.cell[2][1], 0.0));
+        assert!(approx_eq!(f64, cube_data.cell[2][2], 15.872644999999999));
+
         assert_eq!(cube_data.atoms[0].an, 3u32);
         assert_eq!(cube_data.atoms[cube_data.atoms.len() - 1].an, 16u32);
-        approx_eq!(f32, cube_data.atoms[0].charge, 0f32);
+        assert!(approx_eq!(f32, cube_data.atoms[0].charge, 0f32));
         assert_eq!(
             cube_data.data.len(),
             (cube_data.shape[0] * cube_data.shape[1] * cube_data.shape[2]) as usize
