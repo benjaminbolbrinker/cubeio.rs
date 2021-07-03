@@ -1,6 +1,6 @@
 [package]
 name = "cubeio"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Benjamin Bolbrinker <benjamin.bolbrinker@kemi.uu.se>"]
 edition = "2018"
 description = "File io for Gaussian CUBE file format."
