@@ -11,9 +11,9 @@ fn parse_line(line: String) -> Vec<f64> {
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Atom {
-    an: u32,
-    charge: f32,
-    pos: Vec<f64>,
+    pub an: u32,
+    pub charge: f32,
+    pub pos: Vec<f64>,
 }
 
 #[derive(Debug)]
