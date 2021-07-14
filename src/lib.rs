@@ -11,16 +11,16 @@ fn parse_line(line: String) -> Vec<f64> {
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Atom {
-    pub an: u32,
+    pub an: usize,
     pub charge: f32,
     pub pos: Vec<f64>,
 }
 
 #[derive(Debug)]
 pub struct CubeData {
-    pub n_atoms: u32,
+    pub n_atoms: usize,
     pub origin: Vec<f64>,
-    pub shape: Vec<u32>,
+    pub shape: Vec<usize>,
     pub data: Vec<f64>,
     pub cell: Vec<Vec<f64>>,
     pub atoms: Vec<Atom>,
@@ -31,7 +31,7 @@ impl CubeData {
         CubeData {
             n_atoms: 0,
             origin: vec![0f64; 3],
-            shape: vec![0u32; 3],
+            shape: vec![0usize; 3],
             cell: vec![vec![0f64; 3]; 3],
             atoms: Vec::new(),
             data: Vec::new(),
@@ -48,24 +48,24 @@ pub fn read_cube(file_name: &str) -> std::io::Result<CubeData> {
     lines.next();
     lines.next();
     let line3 = parse_line(lines.next().unwrap()?);
-    cube_data.n_atoms = line3[0] as u32;
+    cube_data.n_atoms = line3[0] as usize;
     cube_data.origin = Vec::from(&line3[1..]);
 
     let line4 = parse_line(lines.next().unwrap()?);
     let line5 = parse_line(lines.next().unwrap()?);
     let line6 = parse_line(lines.next().unwrap()?);
 
-    cube_data.shape[0] = line4[0] as u32;
+    cube_data.shape[0] = line4[0] as usize;
     cube_data.cell[0] = Vec::from(&line4[1..])
         .iter()
         .map(|x| x * cube_data.shape[0] as f64)
         .collect();
-    cube_data.shape[1] = line5[0] as u32;
+    cube_data.shape[1] = line5[0] as usize;
     cube_data.cell[1] = Vec::from(&line5[1..])
         .iter()
         .map(|x| x * cube_data.shape[1] as f64)
         .collect();
-    cube_data.shape[2] = line6[0] as u32;
+    cube_data.shape[2] = line6[0] as usize;
     cube_data.cell[2] = Vec::from(&line6[1..])
         .iter()
         .map(|x| x * cube_data.shape[2] as f64)
@@ -75,7 +75,7 @@ pub fn read_cube(file_name: &str) -> std::io::Result<CubeData> {
     while idx < cube_data.n_atoms {
         let line_atom = parse_line(lines.next().unwrap()?);
         cube_data.atoms.push(Atom {
-            an: line_atom[0] as u32,
+            an: line_atom[0] as usize,
             charge: line_atom[1] as f32,
             pos: Vec::from(&line_atom[2..]),
         });
@@ -162,7 +162,7 @@ mod tests {
         let cube_data = super::read_cube("tdc.cube").unwrap();
         assert_eq!(cube_data.n_atoms, 30);
         assert_eq!(cube_data.origin, vec![0f64; 3]);
-        assert_eq!(cube_data.shape, vec![79u32, 52u32, 85u32]);
+        assert_eq!(cube_data.shape, vec![79usize, 52usize, 85usize]);
 
         assert!(approx_eq!(f64, cube_data.cell[0][0], 14.831539));
         assert!(approx_eq!(f64, cube_data.cell[0][1], 0.0));
@@ -176,8 +176,8 @@ mod tests {
         assert!(approx_eq!(f64, cube_data.cell[2][1], 0.0));
         assert!(approx_eq!(f64, cube_data.cell[2][2], 15.872644999999999));
 
-        assert_eq!(cube_data.atoms[0].an, 3u32);
-        assert_eq!(cube_data.atoms[cube_data.atoms.len() - 1].an, 16u32);
+        assert_eq!(cube_data.atoms[0].an, 3usize);
+        assert_eq!(cube_data.atoms[cube_data.atoms.len() - 1].an, 16usize);
         assert!(approx_eq!(f32, cube_data.atoms[0].charge, 0f32));
         assert_eq!(
             cube_data.data.len(),
